@@ -36,7 +36,8 @@ Phone/desktop camera photos of a physical object → 3D reconstruction → inter
 
 ## Decisions already made (don't relitigate without new evidence)
 
-- **Do not build a reconstruction engine.** Use COLMAP (BSD-3) in a cloud GPU worker for the MVP; Apple Object Capture on iOS later. The product's differentiator is the print-preparation pipeline, not scanning.
+- **Do not build a reconstruction engine.** Use COLMAP (BSD-3) in a cloud GPU worker for the MVP.
+- **Android is the primary mobile platform** (the user's own device). No LiDAR and no quality on-device reconstruction on Android, so reconstruction is cloud-side. ARCore poses may give a rough metric scale (few-% error), useful as a hint, not a replacement for a known dimension. iOS/Object Capture is optional, later. The product's differentiator is the print-preparation pipeline, not scanning.
 - **MVP exports STL/3MF only.** No G-code and no printer connectivity in the MVP. Users slice in their own slicer.
 - **Scale comes from the user or a reference object.** Photogrammetry has no absolute scale; never present dimensions as accurate without one.
 - **Approval gate is mandatory:** the final print file is produced only after an explicit user confirmation step. Keep model creation and print preparation as separate stages/modules.
