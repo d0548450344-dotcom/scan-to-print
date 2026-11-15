@@ -12,10 +12,13 @@ dependencies = [
     "lxml>=5.0",
     "shapely>=2.0",
     "mapbox-earcut>=1.0",
+    "pillow>=10",
 ]
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
+# GPU reconstruction (Colab / NVIDIA). CPU-only pycolmap cannot run the dense step.
+recon = ["pycolmap-cuda12==4.2.1"]
 
 [project.scripts]
 scan2print = "scan2print.cli:main"

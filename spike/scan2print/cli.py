@@ -27,8 +27,9 @@ def _evaluate(a: argparse.Namespace) -> int:
 
 
 def _reconstruct(a: argparse.Namespace) -> int:
-    from .reconstruct import colmap_mesh
-    print(colmap_mesh(a.images, a.workspace, a.colmap, a.quality))
+    from .reconstruct import reconstruct
+    rep = reconstruct(a.images, a.workspace, a.max_image_size, a.poisson_depth)
+    print(json.dumps(rep.__dict__, ensure_ascii=False, indent=2))
     return 0
 
 
@@ -50,11 +51,11 @@ def main(argv: list[str] | None = None) -> int:
     pe.add_argument("--report", help="per-dimension CSV report path")
     pe.set_defaults(func=_evaluate)
 
-    pr = sub.add_parser("reconstruct", help="run COLMAP on a folder of photos (GPU machine only)")
-    pr.add_argument("images")
-    pr.add_argument("workspace")
-    pr.add_argument("--colmap", default="colmap")
-    pr.add_argument("--quality", default="medium", choices=("low", "medium", "high", "extreme"))
+    pr = sub.add_parser("reconstruct", help="photos -> object mesh with pycolmap (NVIDIA GPU needed)")
+    pr.add_argument("images", help="folder of photos of one object")
+    pr.add_argument("workspace", help="output folder (deleted and recreated)")
+    pr.add_argument("--max-image-size", type=int, default=2000, help="dense-step image size; lower if GPU runs out of memory")
+    pr.add_argument("--poisson-depth", type=int, default=10)
     pr.set_defaults(func=_reconstruct)
 
     a = p.parse_args(argv)
