@@ -1,0 +1,3 @@
+object_id,mesh_path,dim1_mm,dim2_mm,dim3_mm
+wood_block,meshes/wood_block.ply,120.4,58.2,31.0
+mug,meshes/mug.obj,118.0,95.5,95.5
