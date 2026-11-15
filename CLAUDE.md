@@ -4,7 +4,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Status
 
-Pre-code. The project is in **Phase 0 (feasibility spike)**. There is no build, lint or test tooling yet. Do not invent commands; add them here when the first code lands.
+The project is in **Phase 0 (feasibility spike)**. The only code is `spike/`, a Python package (`scan2print`) for print preparation and the accuracy go/no-go check. It is throwaway-quality by intent but its repair/scale/export logic is expected to seed the MVP worker. The protocol the user follows with real objects is `docs/phase0-protocol.md`.
+
+## Commands (run from `spike/`)
+
+```bash
+python -m venv ../.venv && ../.venv/bin/pip install -e '.[dev]'
+../.venv/bin/pytest -q                                   # all tests
+../.venv/bin/pytest -q tests/test_pipeline.py -k scale   # single test
+../.venv/bin/scan2print prepare raw.ply out.3mf --known-mm 120 --cut-mm 1
+../.venv/bin/scan2print evaluate scans.csv --report out/report.csv   # exit 0 = go, 1 = no-go
+```
+
+CI (`.github/workflows/spike.yml`) runs pytest on PRs. `scan2print reconstruct` wraps the COLMAP CLI and is **untested**: the dev container has no COLMAP and no GPU.
+
+## spike/ structure
+
+- `prepare.py` – load → `repair` (drop debris by surface-area ratio, fix normals, fill simple holes; reports instead of hiding non-watertight results) → `scale_to_known` (uniform scale from one real dimension, via oriented-bbox principal extents so rotation doesn't matter) → `flatten_base` (assumes z-up) → `export` (STL/3MF, mm).
+- `measure.py` – go/no-go: scale by the longest caliper dimension, evaluate only the other two (the scaling axis is correct by construction), tolerance 1 mm per 100 mm, pass if ≥70% of objects pass. Failed/missing scans count as failures. Thresholds are constants mirroring `docs/feasibility.md`; change both together.
 
 The product vision (Hebrew) and the decisions below are in `docs/`:
 - `docs/feasibility.md` – feasibility analysis, risks, and the Phase 0 go/no-go criterion
